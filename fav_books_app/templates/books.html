@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <title>Favorite Books</title>
+</head>
+<body class="text-center d-flex flex-column min-vh-100" style="padding-top: 3.5rem;">
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="#">CodingDojo Books</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample01" aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsExample01">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/books">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link float-right" href="/logout">Log Out</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+        <main role="main" class="inner cover">
+            <div class="jumbotron">
+                <div class="container">
+                    <h1 class="cover-heading">Welcome, {{ user_info.first_name }}</h1>
+                </div>
+            </div>
+            
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if messages %}
+                        <ul class="messages text-danger">    
+                            {% for message in messages %}    
+                                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+
+                        <form action="/books/new_book" method="POST" autocomplete="off">
+                            {% csrf_token %}
+                            <div class="form-group row mt-3">
+                                <label for="book">Add a Favorite Book: </label>
+                            </div>
+                            <div class="form-group row">
+                                <div class="input-group-prepend col-sm-4">
+                                    <span class="input-group-text">Title: </span>
+                                </div>
+                                <div class="col-sm-8">
+                                    <input type="text" id="title" name="title" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="input-group-prepend col-sm-4">
+                                    <span class="input-group-text">Author: </span>
+                                </div>
+                                <div class="col-sm-8">
+                                    <input type="text" id="author" name="author" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="input-group-prepend col-sm-4">
+                                    <span class="input-group-text">Description: </span>
+                                </div>                
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" aria-label="Description: " id="description" name="description"></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary float-right mb-5">Add Book</button>
+                        </form>
+                    </div>
+    
+                    <div class="col-md-6">
+                        <h1 class="cover-heading">All Favorited Books:</h1>
+
+                        {% for book in all_books %}
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <p class="lead text-primary float-left ml-3"><a href="{% url 'book_info' book_id=book.id %}">{{ book.title }}</a></p>
+                                        <p class="lead">(added by: {{ book.uploaded_by.first_name }} {{ book.uploaded_by.last_name }})</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    {% if book.user_who_favorited.all|length > 0 %}
+                                        {% if user_info in book.user_who_favorited.all %}
+                                            <div class="col-md-12">
+                                                <p class="mb-3 float-right"><em>This is one of your favorites!</em></p>
+                                            </div>
+                                        {% else %}
+                                            <form action="{% url 'add_to_favorites' book_id=book.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <input class="btn btn-link text-success float-right" type="submit" value="Add to Favorites">
+                                            </form>
+                                        {% endif %}
+                                    {% else %}
+                                        <form action="{% url 'add_to_favorites' book_id=book.id %}" method="POST">
+                                            {% csrf_token %}
+                                            <input class="btn btn-link text-success float-right" type="submit" value="Add to Favorites">
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="navbar bg-dark d-flex flex-column">
+            <footer class="footer text-center">
+                <div class="container">
+                    <span class="text-muted">&copy; Coding Dojo 2021</span>
+                </div>
+            </footer>
+        </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</body>
+</html>
