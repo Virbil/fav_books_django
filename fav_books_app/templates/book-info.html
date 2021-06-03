@@ -71,7 +71,7 @@
                                 <button type="submit" class="btn btn-success float-right mb-5">Update</button>
                             {% endif %}
                         </form>
-                        {% if book_info.uploaded_by.first_name == user_info.first_name %}
+                        {% if book_info.uploaded_by.id == user_info.id %}
                             <button type="submit" class="btn btn-danger float-right"><a style="text-decoration: none; color:white;" href="/books/delete/{{book_info.id}}">Delete</a></button>
                         {% endif %}
 
@@ -89,7 +89,7 @@
                                     </thead>
                                     {% for user in book_info.user_who_favorited.all %}
                                         <tr>
-                                            {% if user.first_name == book_info.uploaded_by.first_name%}
+                                            {% if user.id == book_info.uploaded_by.id%}
                                                 <td>{{ user.first_name }} {{ user.last_name }}</td>
                                             {% else %}
                                             <td>{{ user.first_name }} {{ user.last_name }} <a class="text-success" href="/books/remove_from_favorites/{{ book_info.id }}">Unfavorite</a></td>
